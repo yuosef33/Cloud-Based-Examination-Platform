@@ -1,0 +1,29 @@
+spring:
+  application:
+      name: CloudExaminationPlatform
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/examination_platform
+    username: root
+    password: yuosef
+  jpa:
+    show-sql: ${JPA_SHOWSQL:true}
+    properties:
+      hibernate:
+         format_sql: ${JPA_FORMATSQL:true}
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      mode: always
+logging:
+  pattern:
+    console: ${LOGPATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n}
+  level:
+    org:
+      springframework:
+        security: ${SPRING_SECURITY_LOG_LEVEL:TRACE}
+
+management-token:
+  secret: jkdodosoa]of32['cp@10238321232131#@3321@#@#!@$#!2
+  duration: 1d

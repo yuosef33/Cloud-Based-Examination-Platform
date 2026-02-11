@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql
+    container_name: mysql_GP
+    environment:
+      MYSQL_ROOT_PASSWORD: yuosef
+      MYSQL_DATABASE: examination_platform
+    volumes:
+      - mySql-examination_platform:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - Examination_platform
+
+volumes:
+  mySql-examination_platform:
+
+networks:
+  Examination_platform:
+
+name: Examination_platform_GP
