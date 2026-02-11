@@ -58,6 +58,9 @@ public class SecurityConfig {
                         (request) -> request
                                 .requestMatchers(HttpMethod.POST,"/api/**").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/**").hasRole("USER")
+                                .requestMatchers(HttpMethod.POST,"/lab/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET,"/lab/**").hasRole("ADMIN")
+                                .anyRequest().authenticated()
 
                 ).csrf(csrf -> csrf.disable());
         http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);

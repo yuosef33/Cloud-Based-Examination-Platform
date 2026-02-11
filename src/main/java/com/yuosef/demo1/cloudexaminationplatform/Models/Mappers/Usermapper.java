@@ -12,7 +12,8 @@ public class Usermapper {
             user.getMobileNumber(),
             user.getPwd(),
             user.getCreateDt(),
-            user.getAuthorities());
+            user.getAuthorities(),
+            user.getTemplates());
    };
     public static User toEntity(UserDto userDto){
        return new User(userDto.getId(),
@@ -21,7 +22,8 @@ public class Usermapper {
                userDto.getMobileNumber(),
                userDto.getPwd(),
                userDto.getCreateDt(),
-               userDto.getAuthorities());
+               userDto.getAuthorities(),
+               userDto.getTemplates());
    };
 
 }

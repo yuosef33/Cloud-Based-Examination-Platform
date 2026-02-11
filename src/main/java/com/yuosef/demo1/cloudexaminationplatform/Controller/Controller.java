@@ -42,9 +42,15 @@ public class Controller {
          UserDto user= userService.createUser(userAccountInfo);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
+    @PostMapping("/createAdmin")
+    public ResponseEntity<UserDto> createAdmin(@Valid @RequestBody UserAccountInfo userAccountInfo) throws SystemException {
+        UserDto user= userService.createAdmin(userAccountInfo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
     @PostMapping("/Login")
     public ResponseEntity<Map<String,String>> login(@RequestBody LoginInfo loginInfo){
         return ResponseEntity.ok(new HashMap<>(Map.of("Token",userService.login(loginInfo))));
     }
+
 
 }

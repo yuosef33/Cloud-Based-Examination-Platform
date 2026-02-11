@@ -1,6 +1,7 @@
 package com.yuosef.demo1.cloudexaminationplatform.Models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,11 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "authoritie_id")
     )
     List<Authority> authorities;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "createdBy")
+    @JsonIgnore
+    private List<LabTemplate> templates;
 
     public User(String name, String email, String mobileNumber, String pwd, Date createDt, List<Authority> authorities) {
         this.name = name;

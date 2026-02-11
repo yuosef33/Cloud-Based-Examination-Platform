@@ -9,6 +9,9 @@ import jakarta.transaction.SystemException;
 public interface UserService {
     String login(LoginInfo loginInfo);
     UserDto createUser(UserAccountInfo clientAccInfo) throws SystemException;
+    UserDto createAdmin(UserAccountInfo clientAccInfo) throws SystemException;
     User getUserFromToken(String token) ;
+    User getCurrentUser();
+
 
 }

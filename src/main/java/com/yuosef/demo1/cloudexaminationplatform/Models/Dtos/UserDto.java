@@ -2,6 +2,7 @@ package com.yuosef.demo1.cloudexaminationplatform.Models.Dtos;
 
 
 import com.yuosef.demo1.cloudexaminationplatform.Models.Authority;
+import com.yuosef.demo1.cloudexaminationplatform.Models.LabTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,4 +30,6 @@ public class UserDto {
     private Date createDt;
 
     List<Authority> authorities;
+
+    private List<LabTemplate> templates;
 }

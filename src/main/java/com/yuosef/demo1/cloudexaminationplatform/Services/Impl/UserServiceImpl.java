@@ -12,6 +12,8 @@ import com.yuosef.demo1.cloudexaminationplatform.Models.User;
 import com.yuosef.demo1.cloudexaminationplatform.Services.UserService;
 import jakarta.transaction.SystemException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -63,6 +65,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto createAdmin(UserAccountInfo userAccInfo) throws SystemException {
+        User user= userDao.findUserByEmail(userAccInfo.getUser_email());
+        if(user!=null)
+            throw new SystemException("this email "+userAccInfo.getUser_email()+" is already in use");
+        // client not exist
+        Authority userRole = authorityRepository.findByUserRole("ADMIN");
+        List<Authority> auths = List.of(userRole);
+
+        User user2=new User(userAccInfo.getUser_name(),
+                userAccInfo.getUser_email(),
+                userAccInfo.getUser_phoneNumber(),
+                passwordEncoder.encode(userAccInfo.getUser_password()),
+                new Date(System.currentTimeMillis()),
+                auths
+        );
+        return Usermapper.toDto(userDao.save(user2));
+    }
+
+    @Override
     public User getUserFromToken(String token) {
         String email= tokenHandler.getSubject(token);
         if(Objects.isNull(email)){
@@ -73,5 +94,11 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"this email dose not exist : "+email);
         }
         return user.get();
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }

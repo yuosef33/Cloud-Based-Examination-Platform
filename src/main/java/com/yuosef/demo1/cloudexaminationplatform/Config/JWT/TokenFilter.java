@@ -39,7 +39,7 @@ public class TokenFilter extends OncePerRequestFilter {
                 request.getServletPath().contains("v3") ||
                 request.getServletPath().contains("swagger-ui")||
                 request.getServletPath().contains("OAuth2")||
-                request.getServletPath().contains("forget_password")||
+                request.getServletPath().contains("createAdmin")||
                 request.getServletPath().contains("ForgetPassword")
 
         ){
@@ -73,7 +73,7 @@ public class TokenFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%---Path: " + request.getServletPath());
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=new UsernamePasswordAuthenticationToken(user,null,convertTheAuth(user.getAuthorities()));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
