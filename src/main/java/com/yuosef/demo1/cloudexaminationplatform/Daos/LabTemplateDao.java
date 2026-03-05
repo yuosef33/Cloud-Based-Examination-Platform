@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface LabTemplateDao extends JpaRepository<LabTemplate,Long> {
-    List<LabTemplate> findByUserId(Long userId);
+    List<LabTemplate> findByCreatedBy(Long userId);
 }

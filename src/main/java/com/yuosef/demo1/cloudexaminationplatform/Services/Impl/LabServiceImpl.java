@@ -1,30 +1,49 @@
 package com.yuosef.demo1.cloudexaminationplatform.Services.Impl;
 
+import com.yuosef.demo1.cloudexaminationplatform.Daos.LabDao;
 import com.yuosef.demo1.cloudexaminationplatform.Daos.LabTemplateDao;
 import com.yuosef.demo1.cloudexaminationplatform.Models.Dtos.LabDto;
 import com.yuosef.demo1.cloudexaminationplatform.Models.Dtos.RequestTemplateDto;
 import com.yuosef.demo1.cloudexaminationplatform.Models.Dtos.ResponseTemplateDto;
-
+import com.yuosef.demo1.cloudexaminationplatform.Models.Lab;
+import com.yuosef.demo1.cloudexaminationplatform.Models.LabStatus;
 import com.yuosef.demo1.cloudexaminationplatform.Models.LabTemplate;
 import com.yuosef.demo1.cloudexaminationplatform.Services.LabService;
 import com.yuosef.demo1.cloudexaminationplatform.Services.UserService;
+import jakarta.transaction.SystemException;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class LabServiceImpl implements LabService {
 
+    private final LabDao labDao;
     private final LabTemplateDao labTemplateDao;
     private final UserService userService;
-    public LabServiceImpl(LabTemplateDao labTemplateDao, UserService userService) {
+    public LabServiceImpl(LabDao labDao, LabTemplateDao labTemplateDao, UserService userService) {
+        this.labDao = labDao;
         this.labTemplateDao = labTemplateDao;
         this.userService = userService;
     }
 
     @Override
-    public Object createLab(LabDto labDto) {
-        return null;
+    public Object createLab(LabDto labDto) throws SystemException {
+        LabTemplate template = labTemplateDao
+                .findById(Long.parseLong(labDto.labTemplate()))
+                .orElseThrow(() -> new SystemException("cant find template with that id"));
+
+        Lab lab = new Lab();
+        lab.setLabName(labDto.labName());
+        lab.setLabStartTime(LocalDateTime.now());
+        lab.setLabDuration(Duration.ofMinutes(120));
+        lab.setLabEndTime(LocalDateTime.now().plus(labDto.labDuration()));
+        lab.setStatus(LabStatus.RUNNING);
+        lab.setLabTemplate(template);
+
+        return labDao.save(lab);
     }
 
     @Override
@@ -43,7 +62,7 @@ public class LabServiceImpl implements LabService {
 
     @Override
     public List<LabTemplate> getAlltemplatesByUserId() {
-        return labTemplateDao.findByUserId(userService.getCurrentUser().getId());
+        return labTemplateDao.findByCreatedBy(userService.getCurrentUser().getId());
     }
 
 
