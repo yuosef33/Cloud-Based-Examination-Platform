@@ -3,10 +3,12 @@ package com.yuosef.cloudbasedlabexaminationplatform.services.Impl;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.RefreshTokenDao;
 import com.yuosef.cloudbasedlabexaminationplatform.models.RefreshToken;
 import com.yuosef.cloudbasedlabexaminationplatform.models.User;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.Instant;
 import java.util.UUID;
@@ -21,7 +23,7 @@ public class RefreshTokenServiceImpl {
     private long refreshExpiration;
 
     // Create a new refresh token for the user
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public RefreshToken createRefreshToken(User user) {
         // delete old one first so only one refresh token per user exists
         refreshTokenRepository.deleteByUser(user);

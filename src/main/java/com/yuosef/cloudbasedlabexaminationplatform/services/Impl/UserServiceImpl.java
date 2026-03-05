@@ -9,7 +9,6 @@ import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.*;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Mappers.Usermapper;
 import com.yuosef.cloudbasedlabexaminationplatform.services.UserService;
 import jakarta.transaction.SystemException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -97,30 +97,27 @@ public class UserServiceImpl implements UserService {
     public void logout(User user) {
         refreshTokenService.deleteByUser(user);
     }
-
     @Transactional
     @Override
     public AuthResponse exchangeCode(String code) {
-        // find the code
         OAuthCode oAuthCode = oAuthCodeRepository.findByCode(code)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid code"));
 
-        // check if expired
         if (oAuthCode.isExpired()) {
-            oAuthCodeRepository.delete(oAuthCode);
+            oAuthCodeRepository.deleteByEmail(oAuthCode.getEmail());
             throw new IllegalArgumentException("Code expired, please login again");
         }
 
-        // load the user
-        User user = userDao.findUserByEmail(oAuthCode.getEmail())
+        String email = oAuthCode.getEmail();
+
+        User user = userDao.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // delete code one time use only
-        oAuthCodeRepository.delete(oAuthCode);
-
-        // generate tokens
         String accessToken = tokenHandler.createToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        // delete by email using JPQL — no entity reference conflict
+        oAuthCodeRepository.deleteByEmail(email);
 
         return new AuthResponse(accessToken, refreshToken.getToken());
     }
