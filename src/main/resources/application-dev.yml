@@ -7,13 +7,16 @@ spring:
     username: root
     password: yuosef
 
+  devtools:
+    restart:
+      enabled: false
   jpa:
     show-sql: ${JPA_SHOWSQL:true}
     properties:
       hibernate:
          format_sql: ${JPA_FORMATSQL:true}
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   sql:
     init:
       mode: always
@@ -58,3 +61,8 @@ management:
   endpoint:
     health:
       show-details: always
+
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION:eu-central-1}

@@ -1,11 +1,13 @@
 package com.yuosef.cloudbasedlabexaminationplatform.services.Impl;
 
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.LabDto;
+import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.LabTemplateDto;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.RequestTemplateDto;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.ResponseTemplateDto;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Lab;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabStatus;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
+import com.yuosef.cloudbasedlabexaminationplatform.models.Mappers.LabTemplateMapper;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.LabDao;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.LabTemplateDao;
 import com.yuosef.cloudbasedlabexaminationplatform.services.LabService;
@@ -47,17 +49,12 @@ public class LabServiceImpl implements LabService {
     }
 
     @Override
-    public ResponseTemplateDto createTemplate(RequestTemplateDto requestTemplateDto) {
+    public LabTemplateDto createTemplate(RequestTemplateDto requestTemplateDto) {
         LabTemplate saved= new LabTemplate(requestTemplateDto.amiName(),
-                requestTemplateDto.amiId(),
+                requestTemplateDto.VmId(),
                 userService.getCurrentUser());
         LabTemplate labTemplate = labTemplateDao.save(saved);
-        return new ResponseTemplateDto(labTemplate.getId(),
-                labTemplate.getAmiName(),
-                labTemplate.getAmiId(),
-                labTemplate.getCreatedAt(),
-                labTemplate.getCreatedBy()
-        );
+        return LabTemplateMapper.toDto(labTemplate);
     }
 
     @Override

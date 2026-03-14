@@ -4,6 +4,7 @@ package com.yuosef.cloudbasedlabexaminationplatform.models.Dtos;
 import com.yuosef.cloudbasedlabexaminationplatform.models.AuthProvider;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Authority;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
+import com.yuosef.cloudbasedlabexaminationplatform.models.VmInstance;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
@@ -40,5 +41,8 @@ public class UserDto {
     private AuthProvider authProvider;
 
     private List<LabTemplate> templates;
+
+    private List<VmInstance> instances;
+
 
 }

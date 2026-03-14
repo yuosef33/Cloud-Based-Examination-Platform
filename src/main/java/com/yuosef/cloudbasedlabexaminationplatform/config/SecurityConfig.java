@@ -65,6 +65,7 @@ public class SecurityConfig {
                                         "/oauth2/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/business/logout").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/business/hello").hasRole("USER")
+                                .requestMatchers(HttpMethod.GET, "/lab/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.disable()))

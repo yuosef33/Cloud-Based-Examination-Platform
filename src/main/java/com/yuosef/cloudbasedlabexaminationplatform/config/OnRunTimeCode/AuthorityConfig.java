@@ -1,4 +1,4 @@
-package com.yuosef.cloudbasedlabexaminationplatform.config;
+package com.yuosef.cloudbasedlabexaminationplatform.config.OnRunTimeCode;
 
 import com.yuosef.cloudbasedlabexaminationplatform.repository.AuthorityDao;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Authority;

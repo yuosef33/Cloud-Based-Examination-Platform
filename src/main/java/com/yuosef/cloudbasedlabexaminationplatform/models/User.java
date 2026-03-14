@@ -55,6 +55,10 @@ public class User extends AuditingBase implements UserDetails  {
     @JsonIgnore
     private List<LabTemplate> templates;
 
+    @OneToMany(mappedBy ="user")
+    @JsonIgnore
+    private List<VmInstance> instances;
+
 
     public List<Authority> getRoles() {
         return authorities;

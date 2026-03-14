@@ -1,12 +1,10 @@
 package com.yuosef.cloudbasedlabexaminationplatform.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
@@ -17,6 +15,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class LabTemplate {
 
     @Id
@@ -39,9 +38,17 @@ public class LabTemplate {
     @OneToMany(mappedBy = "labTemplate")
     private List<Lab> labs;
 
+    @OneToMany(mappedBy = "labTemplate")
+    @JsonIgnore
+    private List<VmInstance> instances;
+
     public LabTemplate(String amiName, String amiId, User createdBy) {
         this.amiName = amiName;
         this.amiId = amiId;
         this.createdBy = createdBy;
+    }
+    public LabTemplate(String amiName, String amiId) {
+        this.amiName = amiName;
+        this.amiId = amiId;
     }
 }

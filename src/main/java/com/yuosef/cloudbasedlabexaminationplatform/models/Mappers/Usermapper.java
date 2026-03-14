@@ -15,7 +15,8 @@ public class Usermapper {
             user.getUpdatedAt(),
             user.getRoles(),
             user.getAuthProvider(),
-            user.getTemplates());
+            user.getTemplates(),
+            user.getInstances());
    };
     public static User toEntity(UserDto userDto){
        return new User(userDto.getId(),
@@ -25,7 +26,8 @@ public class Usermapper {
                userDto.getPwd(),
                userDto.getAuthorities(),
                userDto.getAuthProvider(),
-               userDto.getTemplates());
+               userDto.getTemplates(),
+               userDto.getInstances());
    };
 
 }
