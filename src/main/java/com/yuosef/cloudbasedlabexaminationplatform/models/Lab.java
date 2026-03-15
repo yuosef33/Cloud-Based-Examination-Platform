@@ -17,7 +17,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Lab {
+public class Lab extends AuditingBase {
 
     @Id
     @GeneratedValue
@@ -25,16 +25,18 @@ public class Lab {
 
     private  String labName;
 
+    private String labDescription;
+
+    private String labInstructions;
+
     private Duration labDuration;
 
     private LocalDateTime labStartTime;
 
     private LocalDateTime labEndTime;
+
     @Enumerated(EnumType.STRING)
     private LabStatus status;
-
-    @CreationTimestamp
-    private Date createdAt;
 
     @ManyToOne
     @JoinColumn(name = "lab_Template")

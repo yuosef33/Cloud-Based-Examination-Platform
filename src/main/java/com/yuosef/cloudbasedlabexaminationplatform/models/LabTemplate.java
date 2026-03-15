@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.ReadOnlyProperty;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,9 @@ public class LabTemplate {
     @CreationTimestamp
     private Date createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private LabTemplateStatus labTemplateStatus;
+
     @ManyToOne
     @JoinColumn(name = "createdBy")
     @JsonBackReference
@@ -47,8 +51,9 @@ public class LabTemplate {
         this.amiId = amiId;
         this.createdBy = createdBy;
     }
-    public LabTemplate(String amiName, String amiId) {
+    public LabTemplate(String amiName, String amiId,LabTemplateStatus labTemplateStatus) {
         this.amiName = amiName;
         this.amiId = amiId;
+        this.labTemplateStatus = labTemplateStatus;
     }
 }

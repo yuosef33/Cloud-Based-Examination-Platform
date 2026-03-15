@@ -2,12 +2,8 @@ package com.yuosef.cloudbasedlabexaminationplatform.services.Impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yuosef.cloudbasedlabexaminationplatform.config.JWT.TokenHandler;
+import com.yuosef.cloudbasedlabexaminationplatform.models.*;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.TerraformOutput;
-import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
-import com.yuosef.cloudbasedlabexaminationplatform.models.User;
-import com.yuosef.cloudbasedlabexaminationplatform.models.VmInstance;
-import com.yuosef.cloudbasedlabexaminationplatform.models.VmStatus;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.LabTemplateDao;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.VmInstanceDao;
 import lombok.RequiredArgsConstructor;
@@ -265,27 +261,31 @@ public class TerraformService {
         String newAmiId = createImageResponse.imageId();
 
         log.info("AMI creation started: {} for instance: {}", newAmiId, vm.getInstanceId());
-
-        // -------- Step 2: wait for AMI to be available --------
-        waitForAmiAvailable(newAmiId);
-
-        log.info("AMI available: {}", newAmiId);
-
-
-        // -------- Step 3: change the EC2 status to stopped so we can destroy it automatically after period using scheduled functions or queries we can add specific condition that if update time not from like 20 minutes if it less than 20 minutes then dont destroy wait to the coming scheduled query    --------
-        vm.setStatus(VmStatus.STOPPED);
-        vmInstanceDao.save(vm);
-
-        // -------- Step 4: save LabTemplate to DB --------
         User user = vm.getUser();
 
         LabTemplate labTemplate = LabTemplate.builder()
                 .amiName(amiName)
                 .amiId(newAmiId)
                 .createdBy(user)
+                .labTemplateStatus(LabTemplateStatus.PENDING)
                 .build();
 
-        labTemplateDao.save(labTemplate);
+        LabTemplate savedLabTemplate=labTemplateDao.save(labTemplate);
+        // -------- Step 2: wait for AMI to be available --------
+        waitForAmiAvailable(newAmiId);
+
+        log.info("AMI available: {}", newAmiId);
+        savedLabTemplate.setLabTemplateStatus(LabTemplateStatus.AVAILABLE);
+        labTemplateDao.save(savedLabTemplate);
+        // -------- Step 3: change the EC2 status to stopped so we can destroy it automatically after period using scheduled functions or queries we can add specific condition that if update time not from like 20 minutes if it less than 20 minutes then dont destroy wait to the coming scheduled query    --------
+        vm.setStatus(VmStatus.STOPPED);
+        vmInstanceDao.save(vm);
+
+        // -------- Step 4: save LabTemplate to DB --------
+
+
+
+
 
         log.info("Lab template saved: {}", newAmiId);
 

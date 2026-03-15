@@ -1,14 +1,12 @@
 package com.yuosef.cloudbasedlabexaminationplatform.controller;
 
 
-import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.ApiResponse;
-import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.RequestTemplateDto;
-import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.ResponseTemplateDto;
-import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.TerraformOutput;
+import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.*;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
 import com.yuosef.cloudbasedlabexaminationplatform.models.User;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.TerraformService;
 import com.yuosef.cloudbasedlabexaminationplatform.services.LabService;
+import jakarta.transaction.SystemException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +35,7 @@ public class LabController {
     public ResponseEntity<List<LabTemplate>> getAlltemplatesByUserId(){
         return ResponseEntity.ok(labService.getAlltemplatesByUserId());
     }
-    @PostMapping("/Start/Base-template")
+    @DeleteMapping("/Start/Base-template")
     public ResponseEntity<TerraformOutput> startNewLapTemplate(@AuthenticationPrincipal User user) throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED).body(terraformService.createNewLabTemplate(user));
     }
@@ -46,5 +44,10 @@ public class LabController {
         terraformService.destroyVm(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true,"successfully deleted", null));
     }
+    @PostMapping("/create-lab")
+    public ResponseEntity<ApiResponse<?>> createLab(@RequestBody LabDto labDto) throws SystemException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true,"successfully created", labService.createLab(labDto)));
+    }
+
 
 }

@@ -4,5 +4,4 @@ public enum LabStatus {
     CREATED,
     RUNNING,
     FINISHED,
-    EXPIRED
 }
