@@ -17,7 +17,7 @@ public class LabTemplateConfig {
         return args -> {
 
             if (!repo.existsByAmiName("Base_AMI")) {
-                repo.save(new LabTemplate("Base_AMI", "ami-017a8f63571784296", LabTemplateStatus.AVAILABLE));
+                repo.save(new LabTemplate("Base_AMI", "ami-0989a23df83ccca69", LabTemplateStatus.AVAILABLE));
             }
 
         };

@@ -277,7 +277,7 @@ public class TerraformService {
         log.info("AMI available: {}", newAmiId);
         savedLabTemplate.setLabTemplateStatus(LabTemplateStatus.AVAILABLE);
         labTemplateDao.save(savedLabTemplate);
-        // -------- Step 3: change the EC2 status to stopped so we can destroy it automatically after period using scheduled functions or queries we can add specific condition that if update time not from like 20 minutes if it less than 20 minutes then dont destroy wait to the coming scheduled query    --------
+        // -------- Step 3: change the EC2 status to stopped so we can destroy it automatically after period using scheduled functions or queries we can add specific condition that if update time not from like 20 minutes if it less than 20 minutes then don't destroy wait to the coming scheduled query    --------
         vm.setStatus(VmStatus.STOPPED);
         vmInstanceDao.save(vm);
 
