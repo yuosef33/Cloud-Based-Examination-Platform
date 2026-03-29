@@ -37,11 +37,11 @@ public class LabController {
     }
     @PostMapping("/Start/Base-template")
     public ResponseEntity<TerraformOutput> startNewLapTemplate(@AuthenticationPrincipal User user) throws Exception {
-        return ResponseEntity.status(HttpStatus.CREATED).body(terraformService.createNewLabTemplate(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(terraformService.createEc2WithSdk(user,TerraformService.Base_Ami));
     }
     @DeleteMapping("/destroy-machine")
     public ResponseEntity<ApiResponse<?>> destroymachine(@RequestParam String id) throws Exception {
-        terraformService.destroyVm(id);
+        terraformService.destroyVmWithSdk(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true,"successfully deleted", null));
     }
     @PostMapping("/create-lab")

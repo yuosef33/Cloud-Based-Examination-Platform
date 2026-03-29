@@ -27,7 +27,9 @@ public class VmInstance extends AuditingBase {
     private VmStatus status;
 
     private String terraformStateKey;
+
     private String runId;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

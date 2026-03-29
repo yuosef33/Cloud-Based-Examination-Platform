@@ -4,6 +4,7 @@ public enum VmStatus {
     STARTING,
     RUNNING,
     STOPPED,
+    WAITING,
     TERMINATED
 
 }

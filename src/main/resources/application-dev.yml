@@ -11,7 +11,7 @@ spring:
     restart:
       enabled: false
   jpa:
-    show-sql: ${JPA_SHOWSQL:true}
+    show-sql: ${JPA_SHOWSQL:false}
     properties:
       hibernate:
          format_sql: ${JPA_FORMATSQL:true}

@@ -2,18 +2,20 @@ package com.yuosef.cloudbasedlabexaminationplatform.services.Impl.schedule;
 
 import com.yuosef.cloudbasedlabexaminationplatform.models.Lab;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabStatus;
+import com.yuosef.cloudbasedlabexaminationplatform.models.VmInstance;
+import com.yuosef.cloudbasedlabexaminationplatform.models.VmStatus;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.LabDao;
+import com.yuosef.cloudbasedlabexaminationplatform.repository.VmInstanceDao;
+import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.TerraformService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -22,6 +24,8 @@ import java.util.List;
 public class LabScheduler {
     private final LabDao labDao;
     private final TaskScheduler taskScheduler;
+    private final VmInstanceDao vmInstanceDao;
+    private final TerraformService terraformService;
 
 
     @PostConstruct
@@ -43,17 +47,22 @@ public class LabScheduler {
     public void scheduleLab(Lab lab) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime endTime = lab.getLabStartTime().plus(lab.getLabDuration());
-
+        LocalDateTime now2 = LocalDateTime.now();
+        log.info("Current server time: {}", now2);  // ← add this
+        log.info("Lab start time: {}", lab.getLabStartTime());
         // -------- Alarm 1: start the lab --------
         if (lab.getStatus() == LabStatus.CREATED) {
             if (lab.getLabStartTime().isAfter(now)) {
                 // start time is in the future  schedule normally
                 taskScheduler.schedule(
                         () -> startLab(lab.getId()),
-                        lab.getLabStartTime().toInstant(ZoneOffset.UTC)
+                        lab.getLabStartTime().atZone(ZoneId.systemDefault()).toInstant()
                 );
-                log.info("Scheduled START for lab '{}' at {}",
-                        lab.getLabName(), lab.getLabStartTime());
+                log.info("Scheduled START for lab '{}' at {} (instant: {})",
+                        lab.getLabName(),
+                        lab.getLabStartTime(),
+                        lab.getLabStartTime().atZone(ZoneId.systemDefault()).toInstant()
+                );
             } else {
                 // start time already passed ( server was down)
                 // start it immediately
@@ -68,7 +77,7 @@ public class LabScheduler {
             // end time is in the future schedule normally
             taskScheduler.schedule(
                     () -> finishLab(lab.getId()),
-                    endTime.toInstant(ZoneOffset.UTC)
+                    endTime.atZone(ZoneId.systemDefault()).toInstant()
             );
             log.info("Scheduled FINISH for lab '{}' at {}",
                     lab.getLabName(), endTime);
@@ -113,12 +122,26 @@ public class LabScheduler {
                         labId, lab.getStatus());
                 return;
             }
+            List<VmInstance> runningVms = vmInstanceDao
+                    .findByLabTemplateAndStatus(lab.getLabTemplate(), VmStatus.RUNNING);
+
+            for (VmInstance vm : runningVms) {
+                try {
+                    terraformService.stopInstance(vm.getInstanceId());
+                    vm.setStatus(VmStatus.WAITING);
+                    vmInstanceDao.save(vm);
+                    log.info("Stopped VM: {} → WAITING for lab: {}",
+                            vm.getInstanceId(), lab.getLabName());
+                } catch (Exception e) {
+                    log.error("Failed to stop VM {}: {}", vm.getInstanceId(), e.getMessage());
+                }
+            }
 
             lab.setStatus(LabStatus.FINISHED);
             labDao.save(lab);
-
             log.info("Lab FINISHED: '{}'", lab.getLabName());
         });
+
     }
 
 

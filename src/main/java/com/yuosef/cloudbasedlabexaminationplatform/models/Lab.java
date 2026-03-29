@@ -2,21 +2,19 @@ package com.yuosef.cloudbasedlabexaminationplatform.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
+
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
+
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Lab extends AuditingBase {
 
     @Id
