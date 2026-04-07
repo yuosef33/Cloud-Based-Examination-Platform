@@ -3,7 +3,6 @@ package com.yuosef.cloudbasedlabexaminationplatform.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -24,6 +23,7 @@ public class VmInstance extends AuditingBase {
     private Integer vncPort;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 50)
     private VmStatus status;
 
     private String terraformStateKey;
@@ -37,5 +37,9 @@ public class VmInstance extends AuditingBase {
     @ManyToOne
     @JoinColumn(name = "template_id")
     private LabTemplate labTemplate;
+
+    @ManyToOne
+    @JoinColumn(name = "lab_id")
+    private Lab lab;
 
 }

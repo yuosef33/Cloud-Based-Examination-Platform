@@ -96,9 +96,9 @@ public class LabServiceImpl implements LabService {
 
         // ← check if VM already exists before creating
         Optional<VmInstance> existingVm = vmInstanceDao
-                .findByUserAndLabTemplateAndStatus(
+                .findByUserAndLabAndStatus(
                         currentUser,
-                        lab.getLabTemplate(),
+                        lab,
                         VmStatus.RUNNING
                 );
 
@@ -111,7 +111,7 @@ public class LabServiceImpl implements LabService {
         }
 
         // no VM → create new one
-        return terraformService.createEc2WithSdk(currentUser, lab.getLabTemplate().getAmiName());
+        return terraformService.createEc2WithSdk(currentUser, lab.getLabTemplate().getAmiName(),lab);
     }
     @Override
     public TerraformOutput getStudentVm(String labId) throws SystemException {
@@ -121,9 +121,9 @@ public class LabServiceImpl implements LabService {
 
         // find running VM for this user and this lab's template
         VmInstance vm = vmInstanceDao
-                .findByUserAndLabTemplateAndStatus(
+                .findByUserAndLabAndStatus(
                         currentUser,
-                        lab.getLabTemplate(),
+                        lab,
                         VmStatus.RUNNING
                 )
                 .orElse(null);

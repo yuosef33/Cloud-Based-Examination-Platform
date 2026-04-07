@@ -1,12 +1,15 @@
 package com.yuosef.cloudbasedlabexaminationplatform.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -40,5 +43,9 @@ public class Lab extends AuditingBase {
     @JoinColumn(name = "lab_Template")
     @JsonBackReference
     private LabTemplate labTemplate;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "lab")
+    private List<VmInstance> vms;
 
 }

@@ -357,7 +357,7 @@ public class TerraformService {
      * Much faster — ~3-5 seconds vs ~20-40 seconds with Terraform
      * No state files, no init, no apply
      */
-    public TerraformOutput createEc2WithSdk(User user, String amiName) throws Exception {
+    public TerraformOutput createEc2WithSdk(User user, String amiName,Lab lab) throws Exception {
 
         LabTemplate labTemplate = labTemplateDao.findByAmiName(amiName)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -400,6 +400,7 @@ public class TerraformService {
                 .vncPort(5900)
                 .terraformStateKey(null)  // no terraform state
                 .runId(null)              // no terraform run
+                .lab(lab)
                 .build();
 
         vmInstanceDao.save(vmInstance);

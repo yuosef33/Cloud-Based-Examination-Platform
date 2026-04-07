@@ -123,7 +123,7 @@ public class LabScheduler {
                 return;
             }
             List<VmInstance> runningVms = vmInstanceDao
-                    .findByLabTemplateAndStatus(lab.getLabTemplate(), VmStatus.RUNNING);
+                    .findAllByLabAndStatus(lab, VmStatus.RUNNING);
 
             for (VmInstance vm : runningVms) {
                 try {
