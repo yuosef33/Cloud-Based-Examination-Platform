@@ -345,6 +345,35 @@ public class TerraformService {
         log.info("Stopped instance: {}", instanceId);
     }
 
+    public void startInstance(String instanceId) throws InterruptedException {
+        ec2Client.startInstances(StartInstancesRequest.builder()
+                .instanceIds(instanceId)
+                .build());
+        log.info("Start command sent for instance: {}", instanceId);
+
+        // wait until instance state is running
+        for (int i = 0; i < 20; i++) {
+            Thread.sleep(10000); // check every 10 seconds
+
+            DescribeInstancesResponse response = ec2Client.describeInstances(
+                    DescribeInstancesRequest.builder()
+                            .instanceIds(instanceId)
+                            .build()
+            );
+
+            String state = response.reservations().get(0)
+                    .instances().get(0)
+                    .state().nameAsString();
+
+            log.info("Instance {} state: {}", instanceId, state);
+
+            if (state.equals("running")) {
+                log.info("Instance {} is now running", instanceId);
+                return;
+            }
+        }
+        throw new RuntimeException("Instance never reached running state: " + instanceId);
+    }
 
     /**
      *
@@ -371,6 +400,9 @@ public class TerraformService {
                 .maxCount(1)
                 .keyName("Ec2-Base")
                 .securityGroupIds("sg-0687cc28f63bd584a")
+                .iamInstanceProfile(IamInstanceProfileSpecification.builder()
+                        .name("EC2-SSM-S3-Role")
+                        .build())
                 .tagSpecifications(TagSpecification.builder()
                         .resourceType(ResourceType.INSTANCE)
                         .tags(Tag.builder()

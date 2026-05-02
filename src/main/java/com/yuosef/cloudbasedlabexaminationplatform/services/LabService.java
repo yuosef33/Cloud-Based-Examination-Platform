@@ -1,6 +1,7 @@
 package com.yuosef.cloudbasedlabexaminationplatform.services;
 
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.*;
+import com.yuosef.cloudbasedlabexaminationplatform.models.Lab;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
 import jakarta.transaction.SystemException;
 
@@ -15,4 +16,5 @@ public interface LabService {
      List<LabTemplate> getAlltemplatesByUserId();
     TerraformOutput createStudentVm(String labId) throws Exception;
     TerraformOutput getStudentVm(String labId) throws SystemException;
+    List<LabDtoResponse> getMyLabs();
 }

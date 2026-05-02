@@ -32,9 +32,15 @@ public class Lab extends AuditingBase {
 
     private Duration labDuration;
 
+    private String fileDirectory;
+
     private LocalDateTime labStartTime;
 
     private LocalDateTime labEndTime;
+
+    private Long userId;
+
+    private Boolean collected=false;
 
     @Enumerated(EnumType.STRING)
     private LabStatus status;
@@ -47,5 +53,6 @@ public class Lab extends AuditingBase {
     @JsonIgnore
     @OneToMany(mappedBy = "lab")
     private List<VmInstance> vms;
+
 
 }

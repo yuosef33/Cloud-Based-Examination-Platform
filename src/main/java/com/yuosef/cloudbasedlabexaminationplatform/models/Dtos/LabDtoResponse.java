@@ -12,5 +12,7 @@ public record LabDtoResponse(Long labId,
                              LocalDateTime labStartTime,
                              LocalDateTime labEndTime,
                              Long labTemplateId,
-                             LabStatus labStatus) {
+                             LabStatus labStatus,
+                             Boolean collected,
+                             Long userId) {
 }

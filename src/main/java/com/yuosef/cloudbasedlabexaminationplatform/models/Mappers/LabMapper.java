@@ -15,7 +15,9 @@ public class LabMapper {
                 lab.getLabStartTime(),
                 lab.getLabEndTime(),
                 lab.getLabTemplate().getId(),
-                lab.getStatus()
+                lab.getStatus(),
+                lab.getCollected(),
+                lab.getUserId()
         );
     }
 

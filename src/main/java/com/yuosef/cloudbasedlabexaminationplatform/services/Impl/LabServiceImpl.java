@@ -56,9 +56,11 @@ public class LabServiceImpl implements LabService {
         lab.setLabInstructions(labDto.labInstructions());
         lab.setLabStartTime(labDto.labStartTime());
         lab.setLabDuration(Duration.ofMinutes(labDto.labDuration()));
+        lab.setFileDirectory(labDto.fileDirectory());
         lab.setLabEndTime(labDto.labStartTime().plus(Duration.ofMinutes(labDto.labDuration())));
         lab.setStatus(LabStatus.CREATED);
         lab.setLabTemplate(template);
+        lab.setUserId(userService.getCurrentUser().getId());
 
         labScheduler.scheduleLab(lab);
         return labDao.save(lab);
@@ -131,5 +133,16 @@ public class LabServiceImpl implements LabService {
         if (vm == null) return null;
 
         return new TerraformOutput(vm.getPublicIp(), vm.getInstanceId());
+    }
+
+    @Override
+    public List<LabDtoResponse> getMyLabs() {
+        User currentUser = userService.getCurrentUser();
+        List<Lab> labs= labDao.findAllByUserId(currentUser.getId());
+        List<LabDtoResponse> newlabs= new ArrayList<>();
+        for (Lab lab: labs){
+            newlabs.add(LabMapper.toDto(lab));
+        }
+        return newlabs;
     }
 }

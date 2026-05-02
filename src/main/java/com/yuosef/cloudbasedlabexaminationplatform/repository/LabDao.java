@@ -2,6 +2,7 @@ package com.yuosef.cloudbasedlabexaminationplatform.repository;
 
 import com.yuosef.cloudbasedlabexaminationplatform.models.Lab;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabStatus;
+import com.yuosef.cloudbasedlabexaminationplatform.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +16,7 @@ public interface LabDao extends JpaRepository<Lab, Long> {
     List<Lab> findByStatus(LabStatus status);
 
     List<Lab> findByStatusIn(Collection<LabStatus> statuses);
+
+    List<Lab> findAllByUserId(Long userId);
+
 }

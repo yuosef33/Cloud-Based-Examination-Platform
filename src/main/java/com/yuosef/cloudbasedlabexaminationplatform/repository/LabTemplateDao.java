@@ -1,5 +1,6 @@
 package com.yuosef.cloudbasedlabexaminationplatform.repository;
 
+import com.yuosef.cloudbasedlabexaminationplatform.models.Lab;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
 import com.yuosef.cloudbasedlabexaminationplatform.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,5 @@ public interface LabTemplateDao extends JpaRepository<LabTemplate,Long> {
     List<LabTemplate> findAllByCreatedBy(User user);
     Optional<LabTemplate> findByAmiName(String amiName);
     boolean existsByAmiName(String amiName);
+
 }

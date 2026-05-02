@@ -4,6 +4,7 @@ package com.yuosef.cloudbasedlabexaminationplatform.controller;
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.*;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
 import com.yuosef.cloudbasedlabexaminationplatform.models.User;
+import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.FileCollectionService;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.TerraformService;
 import com.yuosef.cloudbasedlabexaminationplatform.services.LabService;
 import jakarta.transaction.SystemException;
@@ -21,6 +22,7 @@ import java.util.List;
 public class LabController {
     private final LabService labService;
     private final TerraformService terraformService;
+    private final FileCollectionService fileCollectionService;
 
     @PostMapping("/CreateAmi")
     public ResponseEntity<ApiResponse> createLabTemplate(@RequestBody RequestTemplateDto requestTemplateDto) throws Exception {
@@ -48,6 +50,13 @@ public class LabController {
     public ResponseEntity<ApiResponse<?>> createLab(@RequestBody LabDto labDto) throws SystemException {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true,"successfully created", labService.createLab(labDto)));
     }
-
-
+    @GetMapping("/getMyLabs")
+    public ResponseEntity<ApiResponse<?>> getAllMylabs(){
+        return ResponseEntity.ok(new ApiResponse<>(true,"Get all labs",labService.getMyLabs()));
+    }
+    @PostMapping("/collectAll/{labId}")
+    public ResponseEntity<ApiResponse<?>> collectAllFiles(@PathVariable Long labId){
+        fileCollectionService.collectAllStudentFiles(labId);
+        return ResponseEntity.ok(new ApiResponse<>(true,"successfully collected ",null));
+    }
 }

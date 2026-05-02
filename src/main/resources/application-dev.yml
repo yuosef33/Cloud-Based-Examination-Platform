@@ -66,3 +66,5 @@ aws:
   access-key: ${AWS_ACCESS_KEY}
   secret-key: ${AWS_SECRET_KEY}
   region: ${AWS_REGION:eu-central-1}
+  s3:
+    bucket-name: cloud-based-examintation-platform-data

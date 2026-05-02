@@ -6,6 +6,9 @@ public record LabDto(String labName,
                      String labDescription,
                      String labInstructions,
                      Integer labDuration,
+                     String fileDirectory,
                      LocalDateTime labStartTime,
-                     Long labTemplateId) {
+                     Long labTemplateId,
+                     Boolean collected,
+                     Long userId) {
 }

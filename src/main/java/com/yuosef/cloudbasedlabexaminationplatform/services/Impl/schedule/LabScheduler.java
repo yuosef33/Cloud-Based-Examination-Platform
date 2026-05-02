@@ -6,6 +6,7 @@ import com.yuosef.cloudbasedlabexaminationplatform.models.VmInstance;
 import com.yuosef.cloudbasedlabexaminationplatform.models.VmStatus;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.LabDao;
 import com.yuosef.cloudbasedlabexaminationplatform.repository.VmInstanceDao;
+import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.FileCollectionService;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.TerraformService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class LabScheduler {
     private final TaskScheduler taskScheduler;
     private final VmInstanceDao vmInstanceDao;
     private final TerraformService terraformService;
+    private final FileCollectionService fileCollectionService;
 
 
     @PostConstruct
