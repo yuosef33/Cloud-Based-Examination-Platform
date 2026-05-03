@@ -46,11 +46,15 @@ public class LabServiceImpl implements LabService {
         if(template.getLabTemplateStatus()!=LabTemplateStatus.AVAILABLE){
             throw new SystemException("this "+template.getId()+" lab template is not available");
         }
-
+        Lab lab = new Lab();
         if(labDto.labStartTime().isBefore(LocalDateTime.now()))
             throw new SystemException("the date must be after the current date and time ");
+        if(labDto.fileDirectory()=="" || labDto.fileDirectory()==null){
+            lab.setCollected(true);
+        }
 
-        Lab lab = new Lab();
+
+
         lab.setLabName(labDto.labName());
         lab.setLabDescription(labDto.labDescription());
         lab.setLabInstructions(labDto.labInstructions());

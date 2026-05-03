@@ -273,6 +273,12 @@ public class TerraformService {
 
     @Async
     public void createAmiFromVm(VmInstance vm, String amiName) throws Exception {
+
+        stopInstance(vm.getInstanceId());
+        vm.setStatus(VmStatus.STOPPED);
+        vmInstanceDao.save(vm);
+        log.info("VM : {} stopped successfully to be ready to create ami", vm.getInstanceId());
+
         CreateImageRequest createImageRequest = CreateImageRequest.builder()
                 .instanceId(vm.getInstanceId())
                 .name(amiName)
@@ -298,10 +304,6 @@ public class TerraformService {
         log.info("AMI available: {}", newAmiId);
         savedLabTemplate.setLabTemplateStatus(LabTemplateStatus.AVAILABLE);
         labTemplateDao.save(savedLabTemplate);
-
-        vm.setStatus(VmStatus.STOPPED);
-        vmInstanceDao.save(vm);
-
         log.info("Lab template saved: {}", newAmiId);
     }
 

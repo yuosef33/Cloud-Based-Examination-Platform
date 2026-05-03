@@ -54,6 +54,8 @@ public class FileCollectionService {
 
         if (waitingVms.isEmpty()) {
             log.warn("No WAITING VMs found for lab: {}", labId);
+            lab.setCollected(true);
+            labDao.save(lab);
             return;
         }
 
