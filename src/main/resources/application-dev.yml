@@ -32,6 +32,15 @@ spring:
             scope:
               - email
               - profile
+application:
+  security:
+    jwt:
+      secret-key:  ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+      expiration: 1d
+      refresh-expiration: 604800000 # refresh token — 7 days
+  oauth2:
+    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/auth/oauth2/callback}
+
 logging:
   pattern:
     console: ${LOGPATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n}
@@ -42,14 +51,6 @@ logging:
           utils:
             cache:
               CachedSupplier: off
-  security:
-    jwt:
-      secret-key:  ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-      expiration: 1d
-      refresh-expiration: 604800000 # refresh token — 7 days
-  oauth2:
-    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/auth/oauth2/callback}
-
 springdoc:
   api-docs:
     path: /v3/api-docs

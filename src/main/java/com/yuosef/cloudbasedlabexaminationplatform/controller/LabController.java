@@ -5,16 +5,25 @@ import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.*;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
 import com.yuosef.cloudbasedlabexaminationplatform.models.User;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.FileCollectionService;
+import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.S3Service;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.TerraformService;
 import com.yuosef.cloudbasedlabexaminationplatform.services.LabService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.SystemException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/lab")
@@ -23,6 +32,10 @@ public class LabController {
     private final LabService labService;
     private final TerraformService terraformService;
     private final FileCollectionService fileCollectionService;
+    private final S3Service s3Service;
+    private final S3Client s3Client;
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
 
     @PostMapping("/CreateAmi")
     public ResponseEntity<ApiResponse> createLabTemplate(@RequestBody RequestTemplateDto requestTemplateDto) throws Exception {
@@ -59,4 +72,46 @@ public class LabController {
         fileCollectionService.collectAllStudentFiles(labId);
         return ResponseEntity.ok(new ApiResponse<>(true,"successfully collected ",null));
     }
+    @GetMapping("/labs/{labId}/files")
+    public ResponseEntity<ApiResponse<?>> getLabFiles(@PathVariable Long labId) {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Lab files",
+                s3Service.getLabFiles(labId)));
+    }
+    @GetMapping("/labs/{labId}/files/{studentId}/download")
+    public void downloadStudentFiles(@PathVariable Long labId,
+                                     @PathVariable String studentId,
+                                     HttpServletResponse response) throws IOException {
+
+        String prefix = "labs/" + labId + "/" + studentId + "/";
+
+        ListObjectsV2Response listResponse = s3Client.listObjectsV2(
+                ListObjectsV2Request.builder()
+                        .bucket(bucketName)
+                        .prefix(prefix)
+                        .build()
+        );
+
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"student-" + studentId + "-lab-" + labId + ".zip\"");
+
+        try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
+            for (S3Object obj : listResponse.contents()) {
+                String key = obj.key();
+                String fileName = key.substring(key.lastIndexOf("/") + 1);
+
+                ResponseBytes<GetObjectResponse> s3Object = s3Client.getObjectAsBytes(
+                        GetObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(key)
+                                .build()
+                );
+
+                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.write(s3Object.asByteArray());
+                zipOut.closeEntry();
+            }
+        }
+    }
+
 }
