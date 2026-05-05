@@ -83,12 +83,18 @@ public class FileCollectionService {
         try {
             terraformService.startInstance(vm.getInstanceId());
             waitForSsmReady(vm.getInstanceId());
+
+            // get osType from VM's template
+            String osType = vm.getLabTemplate().getOsType().name();
+
             String commandId = sendCollectionCommand(
                     vm.getInstanceId(),
                     lab.getId(),
                     vm.getUser().getId(),
-                    lab.getFileDirectory()
+                    lab.getFileDirectory(),
+                    osType
             );
+
             waitForCommandCompletion(vm.getInstanceId(), commandId);
             terraformService.destroyVmWithSdk(vm.getInstanceId());
             vm.setStatus(VmStatus.TERMINATED);
@@ -104,29 +110,56 @@ public class FileCollectionService {
         }
     }
 
-    private String sendCollectionCommand(String instanceId, Long labId,
-                                         Long studentId, String sourceDir) {
-        String script = String.format("""
-                $sourcePath = "%s"
-                $destination = "s3://%s/labs/%s/%s/"
-                if (Test-Path $sourcePath) {
-                    aws s3 cp $sourcePath $destination --recursive
-                }
-                """,
+    private String buildWindowsScript(String sourceDir, Long labId, Long studentId) {
+        return String.format("""
+            $sourcePath = "%s"
+            $destination = "s3://%s/labs/%s/%s/"
+            if (Test-Path $sourcePath) {
+                aws s3 cp $sourcePath $destination --recursive
+            }
+            """,
                 sourceDir, bucketName, labId, studentId
         );
+    }
+
+    private String buildLinuxScript(String sourceDir, Long labId, Long studentId) {
+        return String.format("""
+            SOURCE="%s"
+            DEST="s3://%s/labs/%s/%s/"
+            if [ -d "$SOURCE" ]; then
+                aws s3 cp "$SOURCE" "$DEST" --recursive
+            fi
+            """,
+                sourceDir, bucketName, labId, studentId
+        );
+    }
+
+    private String sendCollectionCommand(String instanceId, Long labId,
+                                         Long studentId, String sourceDir,
+                                         String osType) {
+
+        boolean isLinux = "LINUX".equalsIgnoreCase(osType);
+
+        // different document and script based on OS
+        String documentName = isLinux
+                ? "AWS-RunShellScript"
+                : "AWS-RunPowerShellScript";
+
+        String script = isLinux
+                ? buildLinuxScript(sourceDir, labId, studentId)
+                : buildWindowsScript(sourceDir, labId, studentId);
 
         SendCommandResponse response = ssmClient.sendCommand(
                 SendCommandRequest.builder()
                         .instanceIds(instanceId)
-                        .documentName("AWS-RunPowerShellScript")
+                        .documentName(documentName)
                         .parameters(Map.of("commands", List.of(script)))
                         .timeoutSeconds(300)
                         .build()
         );
 
         String commandId = response.command().commandId();
-        log.info("SSM command sent: {} for instance: {}", commandId, instanceId);
+        log.info("SSM {} command sent: {} for instance: {}", osType, commandId, instanceId);
         return commandId;
     }
 

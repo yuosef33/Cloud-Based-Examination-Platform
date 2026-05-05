@@ -2,6 +2,7 @@ package com.yuosef.cloudbasedlabexaminationplatform.models.Mappers;
 
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.LabTemplateDto;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
+import com.yuosef.cloudbasedlabexaminationplatform.models.OsType;
 
 public class LabTemplateMapper {
     public static LabTemplateDto toDto(LabTemplate labTemplate) {
@@ -9,6 +10,7 @@ public class LabTemplateMapper {
                 labTemplate.getId(),
                 labTemplate.getAmiName(),
                 labTemplate.getAmiId(),
+                labTemplate.getOsType(),
                 labTemplate.getCreatedAt(),
                 labTemplate.getCreatedBy().getId()
         );

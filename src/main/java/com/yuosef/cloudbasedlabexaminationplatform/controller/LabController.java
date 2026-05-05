@@ -2,8 +2,10 @@ package com.yuosef.cloudbasedlabexaminationplatform.controller;
 
 
 import com.yuosef.cloudbasedlabexaminationplatform.models.Dtos.*;
+import com.yuosef.cloudbasedlabexaminationplatform.models.Lab;
 import com.yuosef.cloudbasedlabexaminationplatform.models.LabTemplate;
 import com.yuosef.cloudbasedlabexaminationplatform.models.User;
+import com.yuosef.cloudbasedlabexaminationplatform.repository.LabDao;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.FileCollectionService;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.S3Service;
 import com.yuosef.cloudbasedlabexaminationplatform.services.Impl.TerraformService;
@@ -34,13 +36,21 @@ public class LabController {
     private final FileCollectionService fileCollectionService;
     private final S3Service s3Service;
     private final S3Client s3Client;
+    private final LabDao labDao;
+
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
+
     @PostMapping("/CreateAmi")
-    public ResponseEntity<ApiResponse> createLabTemplate(@RequestBody RequestTemplateDto requestTemplateDto) throws Exception {
-        terraformService.createAmiFromVm(terraformService.checkVmExist(requestTemplateDto.VmId()),requestTemplateDto.amiName());
-        return ResponseEntity.ok(new ApiResponse(true," Template creation started ",null));
+    public ResponseEntity<ApiResponse> createLabTemplate(
+            @RequestBody RequestTemplateDto requestTemplateDto) throws Exception {
+        terraformService.createAmiFromVm(
+                terraformService.checkVmExist(requestTemplateDto.VmId()),
+                requestTemplateDto.amiName(),
+                requestTemplateDto.osType()
+        );
+        return ResponseEntity.ok(new ApiResponse(true, "Template creation started", null));
     }
     @PostMapping("/addLabTemplate")
     public ResponseEntity<ApiResponse> addLabTemplate(@RequestBody RequestTemplateDto requestTemplateDto) {
@@ -50,9 +60,17 @@ public class LabController {
     public ResponseEntity<List<LabTemplate>> getAlltemplatesByUserId(){
         return ResponseEntity.ok(labService.getAlltemplatesByUserId());
     }
-    @PostMapping("/Start/Base-template")
-    public ResponseEntity<TerraformOutput> startNewLapTemplate(@AuthenticationPrincipal User user) throws Exception {
-        return ResponseEntity.status(HttpStatus.CREATED).body(terraformService.createEc2WithSdk(user,TerraformService.Base_Ami,null));
+    @PostMapping("/Start/Base-template/{osType}")
+    public ResponseEntity<TerraformOutput> startNewLapTemplate(
+            @AuthenticationPrincipal User user,
+            @PathVariable String osType) throws Exception {
+
+        String baseAmi = "WINDOWS".equalsIgnoreCase(osType)
+                ? TerraformService.Base_Windows_Ami
+                : TerraformService.Base_Linux_Ami;
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(terraformService.createEc2WithSdk(user, baseAmi, null, osType));
     }
     @DeleteMapping("/destroy-machine")
     public ResponseEntity<ApiResponse<?>> destroymachine(@RequestParam String id) throws Exception {
@@ -69,8 +87,16 @@ public class LabController {
     }
     @PostMapping("/collectAll/{labId}")
     public ResponseEntity<ApiResponse<?>> collectAllFiles(@PathVariable Long labId){
+        Lab lab = labDao.findById(labId)
+                .orElseThrow(() -> new RuntimeException("Lab not found"));
+
+        if (lab.getCollected()) {
+            return ResponseEntity.ok(new ApiResponse<>(true, "Already collected", null));
+        }
+
         fileCollectionService.collectAllStudentFiles(labId);
-        return ResponseEntity.ok(new ApiResponse<>(true,"successfully collected ",null));
+        return ResponseEntity.ok(new ApiResponse<>(true,
+                "File collection started in background", null));
     }
     @GetMapping("/labs/{labId}/files")
     public ResponseEntity<ApiResponse<?>> getLabFiles(@PathVariable Long labId) {

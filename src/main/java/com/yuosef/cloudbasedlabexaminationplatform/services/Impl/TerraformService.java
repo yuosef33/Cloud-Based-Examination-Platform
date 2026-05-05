@@ -30,7 +30,8 @@ public class TerraformService {
     private final VmInstanceDao vmInstanceDao;
     private final LabTemplateDao labTemplateDao;
     private final Ec2Client ec2Client;
-    public static final String Base_Ami = "Base_AMI";
+    public static final String Base_Windows_Ami = "Base_AMI";
+    public static final String Base_Linux_Ami = "Base_Linux_AMI";
 
     private static final String TEMPLATE_DIR = "terraform-template";
     private static final String PRE_INIT_DIR = "terraform-pre-init";
@@ -272,12 +273,10 @@ public class TerraformService {
     }
 
     @Async
-    public void createAmiFromVm(VmInstance vm, String amiName) throws Exception {
-
+    public void createAmiFromVm(VmInstance vm, String amiName, String osType) throws Exception {
         stopInstance(vm.getInstanceId());
         vm.setStatus(VmStatus.STOPPED);
         vmInstanceDao.save(vm);
-        log.info("VM : {} stopped successfully to be ready to create ami", vm.getInstanceId());
 
         CreateImageRequest createImageRequest = CreateImageRequest.builder()
                 .instanceId(vm.getInstanceId())
@@ -288,23 +287,18 @@ public class TerraformService {
         CreateImageResponse createImageResponse = ec2Client.createImage(createImageRequest);
         String newAmiId = createImageResponse.imageId();
 
-        log.info("AMI creation started: {} for instance: {}", newAmiId, vm.getInstanceId());
-
         LabTemplate labTemplate = LabTemplate.builder()
                 .amiName(amiName)
                 .amiId(newAmiId)
                 .createdBy(vm.getUser())
+                .osType(OsType.valueOf(osType.toUpperCase()))
                 .labTemplateStatus(LabTemplateStatus.PENDING)
                 .build();
 
         LabTemplate savedLabTemplate = labTemplateDao.save(labTemplate);
-
         waitForAmiAvailable(newAmiId);
-
-        log.info("AMI available: {}", newAmiId);
         savedLabTemplate.setLabTemplateStatus(LabTemplateStatus.AVAILABLE);
         labTemplateDao.save(savedLabTemplate);
-        log.info("Lab template saved: {}", newAmiId);
     }
 
     private void waitForAmiAvailable(String amiId) throws InterruptedException {
@@ -388,16 +382,23 @@ public class TerraformService {
      * Much faster — ~3-5 seconds vs ~20-40 seconds with Terraform
      * No state files, no init, no apply
      */
-    public TerraformOutput createEc2WithSdk(User user, String amiName,Lab lab) throws Exception {
+    public TerraformOutput createEc2WithSdk(User user, String amiName, Lab lab, String osType) throws Exception {
 
         LabTemplate labTemplate = labTemplateDao.findByAmiName(amiName)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "AMI not found: " + amiName));
 
-        // -------- create EC2 instance --------
+        // choose instance type based on OS
+        InstanceType instanceType = "LINUX".equalsIgnoreCase(osType)
+                ? InstanceType.T3_LARGE
+                : InstanceType.T3_2_XLARGE;
+
+        // choose VNC port based on OS
+        int vncPort = "LINUX".equalsIgnoreCase(osType) ? 5901 : 5900;
+
         RunInstancesRequest runRequest = RunInstancesRequest.builder()
                 .imageId(labTemplate.getAmiId())
-                .instanceType(InstanceType.T3_2_XLARGE)
+                .instanceType(instanceType)
                 .minCount(1)
                 .maxCount(1)
                 .keyName("Ec2-Base")
@@ -409,31 +410,29 @@ public class TerraformService {
                         .resourceType(ResourceType.INSTANCE)
                         .tags(Tag.builder()
                                 .key("Name")
-                                .value(user.getName() + "-" + UUID.randomUUID().toString().substring(0, 8) + "-VM")
+                                .value(user.getName() + "-" +
+                                        UUID.randomUUID().toString().substring(0, 8) +
+                                        "-" + osType + "-VM")
                                 .build())
                         .build())
                 .build();
 
         RunInstancesResponse runResponse = ec2Client.runInstances(runRequest);
         String instanceId = runResponse.instances().get(0).instanceId();
+        log.info("EC2 instance created: {} ({})", instanceId, osType);
 
-        log.info("EC2 instance created: {}", instanceId);
-
-        // -------- wait for instance to be running and get public IP --------
         String publicIp = waitForInstanceRunning(instanceId);
-
         log.info("EC2 instance running: {} with IP: {}", instanceId, publicIp);
 
-        // -------- save to DB --------
         VmInstance vmInstance = VmInstance.builder()
                 .instanceId(instanceId)
                 .publicIp(publicIp)
                 .labTemplate(labTemplate)
                 .status(VmStatus.RUNNING)
                 .user(user)
-                .vncPort(5900)
-                .terraformStateKey(null)  // no terraform state
-                .runId(null)              // no terraform run
+                .vncPort(vncPort)
+                .terraformStateKey(null)
+                .runId(null)
                 .lab(lab)
                 .build();
 

@@ -33,6 +33,9 @@ public class LabTemplate {
     @Enumerated(EnumType.STRING)
     private LabTemplateStatus labTemplateStatus;
 
+    @Enumerated(EnumType.STRING)
+    private OsType osType;
+
     @ManyToOne
     @JoinColumn(name = "createdBy")
     @JsonBackReference
