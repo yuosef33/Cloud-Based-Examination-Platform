@@ -8,9 +8,15 @@
 
 ## 📌 Overview
 
-Traditional practical lab exams require physical machines, manual setup, and on-site supervision. This platform eliminates all of that.
+Traditional practical lab exams are constrained by physical infrastructure — they require dedicated lab machines, manual environment setup before every session, on-site supervision, and a tedious process of collecting student work at the end. Scaling this to hundreds of students is a logistical nightmare.
 
-When a student clicks **"Attend Exam"**, the system automatically provisions a dedicated cloud VM (Windows or Linux) just for them — accessible directly in the browser via VNC. When the exam ends, the platform automatically stops all VMs, and the instructor can trigger file collection with one click — pulling every student's submission from their VM and storing it securely in AWS S3.
+This platform solves all of that by moving the entire lab exam experience to the cloud. Instructors create reusable lab environments by configuring a base VM — installing any required software, tools, or IDEs — and saving it as an AWS AMI template. They then schedule lab sessions with a start time, duration, and the environment template. That's it.
+
+On the student side, the experience is seamless. When a student clicks **"Attend Exam"**, the backend automatically provisions a **dedicated AWS EC2 instance** just for them — spun up from the instructor's template in seconds. The student interacts with a full Windows or Linux desktop directly in their browser via VNC over WebSockets, with no software to install and no setup required. A countdown timer tracks the remaining time, and the exam finishes automatically when time runs out.
+
+When the exam ends, all student VMs are stopped immediately — freezing their work at that exact moment. The instructor then clicks **"Collect Files"** from the admin dashboard. The platform restarts all VMs in parallel, uses **AWS SSM** to run PowerShell scripts on Windows machines and **Ansible playbooks** on Linux machines, uploads every student's submission to an organized **AWS S3** bucket, then terminates all VMs automatically. The instructor can browse and download any student's files directly from the dashboard.
+
+The entire platform — from VM provisioning to file collection — runs on AWS and is managed through a clean, role-based web interface built with React.
 
 ---
 
@@ -26,6 +32,21 @@ When a student clicks **"Attend Exam"**, the system automatically provisions a d
 - 👥 **Role-Based Access** — Student and Admin roles with protected routes
 - 📊 **Admin Dashboard** — Create lab templates, schedule labs, monitor status, collect and download student files
 - 🔄 **VM Lifecycle Management** — Automated cleanup scheduler for terminated and waiting VMs
+
+---
+
+## 🧰 Built With
+
+![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge&logo=ansible&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 ---
 
