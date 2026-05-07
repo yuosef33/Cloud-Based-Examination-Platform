@@ -266,7 +266,7 @@ Swagger UI available at: `http://localhost:8080/swagger-ui.html`
 
 **Yuosef** — Individual Graduation Project
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://linkedin.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/yuosefjamal33/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black)](https://github.com/yuosef33)
 
 ---
