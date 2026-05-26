@@ -51,16 +51,19 @@ public class S3Service {
             if (parts.length < 4) continue;
 
             String studentId = parts[2];
-            String fileName = parts[parts.length - 1];
 
-            // generate presigned download URL (valid 1 hour)
+            String studentPrefix = "labs/" + labId + "/" + studentId + "/";
+            String relativePath = key.substring(studentPrefix.length());
+
+            if (relativePath.isEmpty() || relativePath.endsWith("/")) continue;
+
+            String fileName = parts[parts.length - 1];
             String downloadUrl = generatePresignedUrl(key, fileName);
 
             filesByStudent
                     .computeIfAbsent(studentId, k -> new ArrayList<>())
-                    .add(new FileDto(fileName, downloadUrl, obj.size()));
+                    .add(new FileDto(relativePath, fileName, downloadUrl, obj.size()));
         }
-
         return filesByStudent;
     }
 

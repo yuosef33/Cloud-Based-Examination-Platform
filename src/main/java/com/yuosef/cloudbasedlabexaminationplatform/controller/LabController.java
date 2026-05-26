@@ -124,7 +124,9 @@ public class LabController {
         try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
             for (S3Object obj : listResponse.contents()) {
                 String key = obj.key();
-                String fileName = key.substring(key.lastIndexOf("/") + 1);
+                String relativePath = key.substring(prefix.length());
+
+                if (relativePath.isEmpty() || relativePath.endsWith("/")) continue;
 
                 ResponseBytes<GetObjectResponse> s3Object = s3Client.getObjectAsBytes(
                         GetObjectRequest.builder()
@@ -133,7 +135,7 @@ public class LabController {
                                 .build()
                 );
 
-                zipOut.putNextEntry(new ZipEntry(fileName));
+                zipOut.putNextEntry(new ZipEntry(relativePath));
                 zipOut.write(s3Object.asByteArray());
                 zipOut.closeEntry();
             }

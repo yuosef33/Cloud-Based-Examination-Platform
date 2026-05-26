@@ -208,6 +208,9 @@ public class FileCollectionService {
                                         .build()
                         );
                 String status = response.statusAsString();
+                log.info("Command stdout: {}", response.standardOutputContent());
+                log.info("Command stderr: {}", response.standardErrorContent());
+                log.info("Status details: {}", response.statusDetails());
                 log.info("Command {} status: {}", commandId, status);
                 if (status.equals("Success")) return;
                 if (status.equals("Failed") || status.equals("Cancelled")) {

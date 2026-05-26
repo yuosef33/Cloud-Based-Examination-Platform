@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class FileDto {
+    private String filePath;
     private String fileName;
     private String downloadUrl;
     private Long size;
