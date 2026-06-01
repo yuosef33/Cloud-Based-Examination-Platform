@@ -143,22 +143,19 @@ public class TerraformService {
         if (initExit != 0) {
             throw new RuntimeException("Terraform init failed");
         }
-
         // ---------------- terraform apply ----------------
         ProcessBuilder applyBuilder = new ProcessBuilder(
                 "terraform", "apply",
                 "-auto-approve",
                 "-input=false",
-                "-var", "ami_id=" + labTemplate.getAmiId(),
-                "-var", "instance_type=t3.2xlarge",
-                "-var", "instance_name=" + user.getName() + "-" + runId.substring(0, 8) + "-VM"
+                "-var", "ami_id=" + labTemplate.getAmiId(), // AMI ID
+                "-var", "instance_type=t3.2xlarge",         // EC2 TYPE
+                "-var", "instance_name=" + user.getName() + "-" + runId.substring(0, 8) + "-VM" //instance NAME
         );
-
         applyBuilder.environment().put("TF_PLUGIN_CACHE_DIR",
                 new File(PLUGIN_CACHE_DIR).getAbsolutePath());
         applyBuilder.directory(targetDir);
         applyBuilder.redirectErrorStream(true);
-
         Process applyProcess = applyBuilder.start();
         BufferedReader applyReader = new BufferedReader(
                 new InputStreamReader(applyProcess.getInputStream()));
@@ -383,11 +380,9 @@ public class TerraformService {
      * No state files, no init, no apply
      */
     public TerraformOutput createEc2WithSdk(User user, String amiName, Lab lab, String osType) throws Exception {
-
         LabTemplate labTemplate = labTemplateDao.findByAmiName(amiName)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "AMI not found: " + amiName));
-
         // choose instance type based on OS
         InstanceType instanceType = "LINUX".equalsIgnoreCase(osType)
                 ? InstanceType.T3_LARGE

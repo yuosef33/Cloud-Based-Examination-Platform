@@ -8,11 +8,11 @@
         <version>3.5.11</version>
         <relativePath/>
     </parent>
-    <groupId>com.yuosef.Cloud-Based-Lab-Examination-Platform</groupId>
-    <artifactId>Cloud-Based-Lab-Examination-Platform</artifactId>
+    <groupId>com.yuosef.cloud-based-lab-examination-platform</groupId>
+    <artifactId>cloud-based-lab-examination-platform-v1</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Cloud-Based-Lab-Examination-Platform</name>
-    <description>Cloud-Based-Lab-Examination-Platform</description>
+    <name>cloud-based-lab-examination-platform</name>
+    <description>cloud-based-lab-examination-platform</description>
     <url/>
     <licenses>
         <license/>

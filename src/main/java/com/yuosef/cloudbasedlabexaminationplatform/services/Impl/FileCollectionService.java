@@ -58,17 +58,14 @@ public class FileCollectionService {
             labDao.save(lab);
             return;
         }
-
         log.info("Starting parallel file collection for {} VMs in lab: {}",
                 waitingVms.size(), lab.getLabName());
-
         List<CompletableFuture<Void>> futures = waitingVms.stream()
                 .map(vm -> CompletableFuture.runAsync(
                         () -> collectSingleVm(vm, lab),
                         taskExecutor
                 ))
                 .toList();
-
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         // reload to avoid stale entity

@@ -6,27 +6,9 @@ terraform {
     encrypt        = true
   }
 }
-
 provider "aws" {
   region = "eu-central-1"
 }
-
-# variables
-variable "ami_id" {
-  type = string
-  default = ""
-}
-
-variable "instance_type" {
-  type = string
-  default = ""
-}
-
-variable "instance_name" {
-  type = string
-  default = ""
-}
-
 # ec2 resource
 resource "aws_instance" "lab_vm" {
 
@@ -40,6 +22,20 @@ resource "aws_instance" "lab_vm" {
   }
 
 }
+# variables
+variable "ami_id" {
+  type = string
+  default = ""
+}
+variable "instance_type" {
+  type = string
+  default = ""
+}
+variable "instance_name" {
+  type = string
+  default = ""
+}
+
 
 # outputs
 output "public_ip" {
