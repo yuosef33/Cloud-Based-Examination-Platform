@@ -21,6 +21,7 @@ import software.amazon.awssdk.services.ec2.model.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -271,6 +272,8 @@ public class TerraformService {
 
     @Async
     public void createAmiFromVm(VmInstance vm, String amiName, String osType) throws Exception {
+        log.info("AMI creation start {}  ", LocalDateTime.now());
+        long start = System.currentTimeMillis();
         stopInstance(vm.getInstanceId());
         vm.setStatus(VmStatus.STOPPED);
         vmInstanceDao.save(vm);
@@ -294,8 +297,12 @@ public class TerraformService {
 
         LabTemplate savedLabTemplate = labTemplateDao.save(labTemplate);
         waitForAmiAvailable(newAmiId);
+
         savedLabTemplate.setLabTemplateStatus(LabTemplateStatus.AVAILABLE);
         labTemplateDao.save(savedLabTemplate);
+        long end = System.currentTimeMillis();
+        log.info("AMI creation start {}  ", LocalDateTime.now());
+        log.info("Request took {} ms", (end - start));
     }
 
     private void waitForAmiAvailable(String amiId) throws InterruptedException {

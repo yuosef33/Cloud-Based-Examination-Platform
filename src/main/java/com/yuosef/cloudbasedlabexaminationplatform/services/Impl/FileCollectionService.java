@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -46,6 +47,8 @@ public class FileCollectionService {
 
     @Async
     public void collectAllStudentFiles(Long labId) {
+        log.info("files collection start at {}", LocalDateTime.now());
+        long start = System.currentTimeMillis();
         Lab lab = labDao.findById(labId)
                 .orElseThrow(() -> new RuntimeException("Lab not found: " + labId));
 
@@ -73,7 +76,9 @@ public class FileCollectionService {
                 .orElseThrow(() -> new RuntimeException("Lab not found"));
         freshLab.setCollected(true);
         labDao.save(freshLab);
-        log.info("Collection done for lab: {}", lab.getLabName());
+        log.info("Collection done for lab: {} at {}", lab.getLabName(),LocalDateTime.now());
+        long end = System.currentTimeMillis();
+        log.info("Request took {} ms", (end - start));
     }
 
     private void collectSingleVm(VmInstance vm, Lab lab) {
