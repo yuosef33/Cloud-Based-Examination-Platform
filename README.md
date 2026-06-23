@@ -1,6 +1,6 @@
 # ☁️ Cloud-Based Lab Examination Platform
 
-> **Individual Graduation Project** — A full-stack cloud platform that automates the entire lifecycle of practical lab examinations, from real-time VM provisioning to automated file collection, built with Spring Boot, React, and AWS.
+> **Individual Graduation Project** A full-stack cloud platform that automates the entire lifecycle of practical lab examinations, from real-time VM provisioning to automated file collection, built with Spring Boot, React, and AWS.
 
 🔗 **Frontend Repository:** [Graduation-Project-Frontend](https://github.com/yuosef33/Graduation-Project-Frontend)
 
@@ -10,13 +10,13 @@
 
 Traditional practical lab exams are constrained by physical infrastructure — they require dedicated lab machines, manual environment setup before every session, on-site supervision, and a tedious process of collecting student work at the end. Scaling this to hundreds of students is a logistical nightmare.
 
-This platform solves all of that by moving the entire lab exam experience to the cloud. Instructors create reusable lab environments by configuring a base VM — installing any required software, tools, or IDEs — and saving it as an AWS AMI template. They then schedule lab sessions with a start time, duration, and the environment template. That's it.
+This platform solves all of that by moving the entire lab exam experience to the cloud. Instructors create reusable lab environments by configuring a base VM installing any required software, tools, or IDEs and saving it as an AWS AMI template. They then schedule lab sessions with a start time, duration, and the environment template. That's it.
 
-On the student side, the experience is seamless. When a student clicks **"Attend Exam"**, the backend automatically provisions a **dedicated AWS EC2 instance** just for them — spun up from the instructor's template in seconds. The student interacts with a full Windows or Linux desktop directly in their browser via VNC over WebSockets, with no software to install and no setup required. A countdown timer tracks the remaining time, and the exam finishes automatically when time runs out.
+On the student side, the experience is seamless. When a student clicks **"Attend Exam"**, the backend automatically provisions a **dedicated AWS EC2 instance** just for them spun up from the instructor's template in seconds. The student interacts with a full Windows or Linux desktop directly in their browser via VNC over WebSockets, with no software to install and no setup required. A countdown timer tracks the remaining time, and the exam finishes automatically when time runs out.
 
-When the exam ends, all student VMs are stopped immediately — freezing their work at that exact moment. The instructor then clicks **"Collect Files"** from the admin dashboard. The platform restarts all VMs in parallel, uses **AWS SSM** to run PowerShell scripts on Windows machines and **Ansible playbooks** on Linux machines, uploads every student's submission to an organized **AWS S3** bucket, then terminates all VMs automatically. The instructor can browse and download any student's files directly from the dashboard.
+When the exam ends, all student VMs are stopped immediately freezing their work at that exact moment. The instructor then clicks **"Collect Files"** from the admin dashboard. The platform restarts all VMs in parallel, uses **AWS SSM** to run PowerShell scripts on Windows machines and **Ansible playbooks** on Linux machines, uploads every student's submission to an organized **AWS S3** bucket, then terminates all VMs automatically. The instructor can browse and download any student's files directly from the dashboard.
 
-The entire platform — from VM provisioning to file collection — runs on AWS and is managed through a clean, role-based web interface built with React.
+The entire platform from VM provisioning to file collection runs on AWS and is managed through a clean, role-based web interface built with React.
 
 ---
 
