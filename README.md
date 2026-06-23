@@ -35,6 +35,14 @@ The entire platform from VM provisioning to file collection runs on AWS and is m
 
 ---
 
+## 🎥 Project Demo
+
+A complete demonstration of the platform is available on YouTube:
+
+[Watch Demo Video](https://youtu.be/GxzZvyIzjHU)
+
+---
+
 ## 🧰 Built With
 
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
@@ -268,7 +276,7 @@ Swagger UI available at: `http://localhost:8080/swagger-ui.html`
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/yuosefjamal33/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black)](https://github.com/yuosef33)
-
+[![Demo Video](https://img.shields.io/badge/Watch-Demo-red?logo=youtube)](https://youtu.be/GxzZvyIzjHU)
 ---
 
 ## 📄 License
